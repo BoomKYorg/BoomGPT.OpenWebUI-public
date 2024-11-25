@@ -547,6 +547,8 @@
 				on:input={searchDebounceHandler}
 				placeholder={$i18n.t('Search')}
 			/>
+
+			<h5>Dashboard</h5>
 		</div>
 
 		<div
