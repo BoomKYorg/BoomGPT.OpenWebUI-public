@@ -101,3 +101,9 @@ export const PASTED_TEXT_CHARACTER_LIMIT = 1000;
 // This feature, akin to $env/static/private, exclusively incorporates environment variables
 // that are prefixed with config.kit.env.publicPrefix (usually set to PUBLIC_).
 // Consequently, these variables can be securely exposed to client-side code.
+
+export const LMS_BASE_URL = 'https://boomgpt-opignolms.lndo.site'
+export const LMS_API_BASE_PATH = '/';
+export const CLIENT_ID = `vPpc1TA-m_kUXXXTL_rsRlsf-FSnKKI9ryOw7MYZm4Y`;
+export const CLIENT_UUID = `vPpc1TA-m_kUXXXTL_rsRlsf-FSnKKI9ryOw7MYZm4Y`;
+export const CLIENT_SECRET = `boomboomboom`;

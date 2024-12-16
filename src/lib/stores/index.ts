@@ -8,6 +8,7 @@ import type { Socket } from 'socket.io-client';
 export const WEBUI_NAME = writable(APP_NAME);
 export const config: Writable<Config | undefined> = writable(undefined);
 export const user: Writable<SessionUser | undefined> = writable(undefined);
+export const lms_user: Writable<LMSSessionUser | undefined> = writable(undefined);
 
 // Frontend
 export const MODEL_DOWNLOAD_POOL = writable({});
@@ -40,6 +41,9 @@ export const settings: Writable<Settings> = writable({});
 
 export const showSidebar = writable(false);
 export const showSettings = writable(false);
+
+export const showCurriculum = writable(false);
+
 export const showArchivedChats = writable(false);
 export const showChangelog = writable(false);
 
@@ -200,3 +204,11 @@ type SessionUser = {
 	role: string;
 	profile_image_url: string;
 };
+
+type LMSSessionUser = {
+	session_id: string
+}
+
+type LMSTrainings = {
+	trainings: string[] | null;
+}

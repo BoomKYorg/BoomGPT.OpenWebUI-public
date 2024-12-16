@@ -16,7 +16,8 @@
 		pinnedChats,
 		scrollPaginationEnabled,
 		currentChatPage,
-		temporaryChatEnabled
+		temporaryChatEnabled,
+		showCurriculum
 	} from '$lib/stores';
 	import { onMount, getContext, tick, onDestroy } from 'svelte';
 
@@ -414,7 +415,7 @@
 			? ''
 			: 'invisible'}"
 	>
-		<div class="px-1.5 flex justify-between space-x-1 text-gray-600 dark:text-gray-400">
+		<!-- <div class="px-1.5 flex justify-between space-x-1 text-gray-600 dark:text-gray-400">
 			<a
 				id="sidebar-new-chat-button"
 				class="flex flex-1 rounded-lg px-2 py-1 h-full hover:bg-gray-100 dark:hover:bg-gray-900 transition"
@@ -435,7 +436,7 @@
 				<div class="self-center mx-1.5">
 					<img
 						crossorigin="anonymous"
-						src="{WEBUI_BASE_URL}/static/favicon.png"
+						src="/boom-ky-homepage.png"
 						class=" size-5 -translate-x-1.5 rounded-full"
 						alt="logo"
 					/>
@@ -468,6 +469,31 @@
 					</svg>
 				</div>
 			</button>
+		</div> -->
+
+		<div class="px-1.5 flex justify-center text-gray-800 dark:text-gray-200">
+			<a
+				id="sidebar-new-chat-button"
+				class="flex flex-1 rounded-lg px-2 py-1 h-full hover:bg-gray-100 dark:hover:bg-gray-900 transition"
+				href="/"
+				draggable="false"
+				on:click={async () => {
+					selectedChatId = null;
+					await goto('/');
+					const newChatButton = document.getElementById('new-chat-button');
+					setTimeout(() => {
+						newChatButton?.click();
+						if ($mobile) {
+							showSidebar.set(false);
+						}
+					}, 0);
+				}}
+			>
+				<div class=" self-center mr-3">
+					<img src="/boom-ky-homepage.png" width="40" height="40" alt="logo" />
+				</div>
+				<div class=" self-center truncate">{$i18n.t('BoomGPT')}</div>
+			</a>
 		</div>
 
 		{#if $user?.role === 'admin' || $user?.permissions?.workspace?.models || $user?.permissions?.workspace?.knowledge || $user?.permissions?.workspace?.prompts || $user?.permissions?.workspace?.tools}
@@ -532,19 +558,9 @@
 					</button>
 				</Tooltip>
 			</div>
-<<<<<<< HEAD
 
-			<SearchInput
-				bind:value={search}
-				on:input={searchDebounceHandler}
-				placeholder={$i18n.t('Search')}
-			/>
-
-			<h5>Dashboard</h5>
-=======
->>>>>>> main
-		</div>
-
+		</div>	
+		
 		<div
 			class="relative flex flex-col flex-1 overflow-y-auto {$temporaryChatEnabled
 				? 'opacity-20'

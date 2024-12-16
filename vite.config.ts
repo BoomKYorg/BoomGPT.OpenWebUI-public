@@ -22,7 +22,8 @@ export default defineConfig({
 		APP_BUILD_HASH: JSON.stringify(process.env.APP_BUILD_HASH || 'dev-build')
 	},
 	build: {
-		sourcemap: true
+		minify: false, // Turn off minification temporarily
+    	sourcemap: false, // Disable sourcemaps
 	},
 	worker: {
 		format: 'es'

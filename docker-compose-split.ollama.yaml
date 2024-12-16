@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  frontend:
+    build: .
+    command: ["npm", "run", "dev"]
+    volumes:
+      - ./src:/src
+    restart: unless-stopped
+    ports:
+      - "3000:5173"
+    environment:
+      - CHOKIDAR_USEPOLLING=true # Enable polling for file watching inside Docker
+    depends_on:
+      - backend
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  backend:
+    build:
+      context: .
+      target: base
+    command: ["bash", "dev.sh"]
+    env_file: ".env"
+    environment:
+      - ENV=dev
+      - WEBUI_AUTH=True
+    ports:
+      - "8080:8080"
+    volumes:
+      - data:/backend/data
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: unless-stopped
+
+volumes:
+  data: {}
