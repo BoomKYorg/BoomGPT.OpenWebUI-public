@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 	import { marked } from 'marked';
+	import { LMS_BASE_URL, BEARER_TOKEN, DEFAULT_GROUP_ID,  } from '$lib/constants';
 
 	import { onMount, getContext, tick, createEventDispatcher } from 'svelte';
 	import { blur, fade } from 'svelte/transition';
@@ -16,6 +17,11 @@
 	import EyeSlash from '$lib/components/icons/EyeSlash.svelte';
 	import MessageInput from './MessageInput.svelte';
 	import BoomLMSStatusBlock from './BoomLMS/BoomLMSStatusBlock.svelte';
+	import BoomLMSSlideoutPanel from './BoomLMS/BoomLMSSlideoutPanel.svelte';
+	import BoomLMSSuggestionsBlock from './BoomLMS/BoomLMSSuggestionsBlock.svelte';
+
+	import { getLMSSession, getLMSLearningPathProgress, getLMSTrainings} from '$lib/apis/boomlms';
+	import { getSessionUser } from '$lib/apis/auths';
 
 	const i18n = getContext('i18n');
 
@@ -36,6 +42,19 @@
 
 	export let selectedToolIds = [];
 	export let webSearchEnabled = false;
+
+	let lms_status_data = {
+		data: [],
+		output: ""
+	};
+	let lms_user_data = {
+		data: [],
+		output: ""
+	};
+	let lms_suggestions_data = {
+		data: [],
+		output: ""
+	};
 
 	let models = [];
 
@@ -84,7 +103,32 @@
 
 	$: models = selectedModels.map((id) => $_models.find((m) => m.id === id));
 
-	onMount(() => {});
+	onMount(async () => {
+		let lms_token = localStorage.getItem("lmsAuthToken");
+		let gpt_token = localStorage.getItem("token");
+
+		if(lms_token && gpt_token){
+
+			try {
+				const trainings = await getLMSTrainings(lms_token);
+				console.log("User Trainings:", trainings);
+			} catch (error) {
+				console.error("Error fetching User Trainings:", error.message);
+			}
+
+			try {
+				const lp = await getLMSLearningPathProgress(lms_token, 4);
+				console.log("Learning Path:", lp);
+				lms_user_data.data = lp;
+			} catch (error) {
+				console.error("Error fetching Learning Path:", error.message);
+			} 
+
+        } else {
+			// show login message
+			lms_user_data.output = `<p><a href="${LMS_BASE_URL}/group/${DEFAULT_GROUP_ID}">Please login and authenticate your credentials</a></p>`;
+		}
+	});
 </script>
 
 <div class="m-auto mt-2 w-full max-w-6xl px-2 xl:px-20 translate-y-2 py-24 text-center pt-8">
@@ -119,11 +163,13 @@
 
 			</div>
 
+			<BoomLMSStatusBlock
+				{lms_status_data}>
+			</BoomLMSStatusBlock>
 
-			<div class="flex flex-row justify-center gap-3 sm:gap-3.5 w-fit px-5">
-				<!--- dashboard -->
-				<BoomLMSStatusBlock></BoomLMSStatusBlock>
-			</div>
+			<BoomLMSSlideoutPanel
+				{lms_user_data}>
+			</BoomLMSSlideoutPanel>
 
 			<div class="flex mt-1 mb-2">
 				<div in:fade={{ duration: 100, delay: 50 }}>
@@ -192,16 +238,19 @@
 			</div>
 		</div>
 	</div>
-	<!-- <div class="mx-auto max-w-2xl font-primary" in:fade={{ duration: 200, delay: 200 }}>
+	<div class="mx-auto max-w-2xl font-primary" in:fade={{ duration: 200, delay: 200 }}>
 		<div class="mx-5">
-			<Suggestions
+			<!-- <Suggestions
 				suggestionPrompts={models[selectedModelIdx]?.info?.meta?.suggestion_prompts ??
 					$config?.default_prompt_suggestions ??
 					[]}
 				on:select={(e) => {
 					selectSuggestionPrompt(e.detail);
 				}}
-			/>
+			/> -->
+			<BoomLMSSuggestionsBlock
+				{lms_suggestions_data}>
+			</BoomLMSSuggestionsBlock>
 		</div>
-	</div> -->
+	</div>
 </div>

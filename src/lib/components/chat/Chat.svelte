@@ -35,7 +35,9 @@
 		showOverview,
 		chatTitle,
 		showArtifacts,
-		tools
+		tools,
+		lms_user,
+		lms_trainings
 	} from '$lib/stores';
 	import {
 		convertMessagesToHistory,
@@ -63,6 +65,7 @@
 	import { createOpenAITextStream } from '$lib/apis/streaming';
 	import { queryMemory } from '$lib/apis/memories';
 	import { getAndUpdateUserLocation, getUserSettings } from '$lib/apis/users';
+	import { getLMSLearningPathProgress, getLMSSession, getLMSTrainings } from '$lib/apis/boomlms';
 	import {
 		chatCompleted,
 		generateTitle,

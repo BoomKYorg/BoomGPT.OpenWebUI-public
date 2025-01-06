@@ -6,27 +6,32 @@ export const getLMSSession = async (email: string, pass: string) => {
 	const res = await fetch(`${LMS_BASE_URL}/oauth/token`, {
 		method: "POST",
 		headers: {
-			"Content-Type": "application/x-www-form-urlencoded",
-			"grant_type": "password",
-			"client_id": CLIENT_ID,
-			"client_secret": CLIENT_SECRET,
-			"scope": "rest",
+		  "Content-Type": "application/x-www-form-urlencoded",
 		},
-		body: JSON.stringify({			
-			username: email,
-			password: pass,
-		})
-	})
-	.then(async (resource) => {
-		if (!resource.ok) throw await resource.json();
-		return resource.json();
-	})
-	.catch((err) => {
-		console.log(err);
-		error = err.detail;
+		body: new URLSearchParams({
+		  grant_type: "password",
+		  client_id: CLIENT_ID,
+		  client_secret: CLIENT_SECRET,
+		  scope: "learner",
+		  username: email,
+		  password: pass,
+		}).toString(),
+		credentials: "include",
+	  });
+	try {
+	if (!res.ok) {
+		const errorData = await res.json();
+		throw new Error(errorData.detail || "Unknown error occurred");
+	}
+	
+	const data = await res.json();
+	console.log("Token received:", data);
+		return data;
+	} catch (err) {
+	console.error("Error during authentication:", err.message);
 		return null;
-	});
-		
+	}
+	
 	if (error) {
 		throw error;
 	}
@@ -66,24 +71,58 @@ export const updateUserPassword = async (token: string, password: string, newPas
 };
 
 export const getLMSTrainings = async (token: string) => {
-	let error = null;
-	const res = await fetch(`${LMS_BASE_URL}/boomgpt/getProgress`, {
-		method: "GET",
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		},
-		redirect: "follow"
-	})
-	.then((response) => response.text())
-	.then((result) => console.log(result))
-	.catch((error) => console.error(error));
-		
-	if (error) {
-		throw error;
+	try {
+		const res = await fetch(`${LMS_BASE_URL}/boomgpt/getUserTrainings?_format=json`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			credentials: 'include'
+		});
+
+		// Check for HTTP errors
+		if (!res.ok) {
+			const errorData = await res.json();
+			throw new Error(`Error ${res.status}: ${errorData.message || "Request failed"}`);
+		}
+
+		// Parse response JSON
+		const result = await res.json();
+		console.log("Result:", result);
+
+		return result;
+	} catch (error: any) {
+		console.error("Fetch error:", error.message);
+		throw error; // Rethrow error for higher-level handling
 	}
+};
 
-	console.log(res);
+export const getLMSLearningPathProgress = async (token: string, group: number) => {
+	try {
+		const res = await fetch(`${LMS_BASE_URL}/boomgpt/learning_path_progress/${group}?_format=json`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			credentials: 'include',
+			mode: "no-cors", // Bypass CORS enforcement
+		});
 
-	return res;
+		// Check for HTTP errors
+		if (!res.ok) {
+			const errorData = await res.json();
+			throw new Error(`Error ${res.status}: ${errorData.message || "Request failed"}`);
+		}
+
+		// Parse response JSON
+		const result = await res.json();
+		console.log("Result:", result);
+
+		return result;
+	} catch (error: any) {
+		console.error("Fetch error:", error.message);
+		throw error; // Rethrow error for higher-level handling
+	}
 };
